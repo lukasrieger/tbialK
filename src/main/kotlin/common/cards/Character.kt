@@ -27,7 +27,10 @@ enum class Character(
         4
     ),
     KentBeck(
-        "Kent Beck", "Inventor of Extreme Programming", "Drop two cards and gain mental health", 4
+        "Kent Beck",
+        "Inventor of Extreme Programming",
+        "Drop two cards and gain mental health",
+        4
     ),
     SteveJobs("Steve Jobs", "Founder of Apple", "Gets a second chance", 4),
     SteveBallmer(
@@ -37,7 +40,10 @@ enum class Character(
         4
     ),
     LinusTorvalds(
-        "Linus Torvalds", "Linux Inventor", "Bugs found can only be deflected with two excuses", 4
+        "Linus Torvalds",
+        "Linux Inventor",
+        "Bugs found can only be deflected with two excuses",
+        4
     ),
     HolierThanThou("Holier than Thou", "Found Everywhere", "Sees everyone with -1 prestige", 4),
     KonradZuse(
@@ -48,7 +54,10 @@ enum class Character(
     ),
     BruceSchneier("Bruce Schneier", "Security Guru", "May report an arbitrary number of bugs", 4),
     TerryWeissman(
-        "Terry Weissman", "Found of Bugzilla", "Got a bug? .25 percent chance for delegation", 4
+        "Terry Weissman",
+        "Found of Bugzilla",
+        "Got a bug? .25 percent chance for delegation",
+        4
     ),
     Dummy("Dummy", "Dummy hwile Characters aren't implemented", "Nothing", 4);
 

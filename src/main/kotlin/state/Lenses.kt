@@ -84,7 +84,6 @@ private fun popFromHeap(count: Int) = GameState.heap.lift { it.drop(count) }
 private fun removeCard(player: Player, card: Card) =
     GameState.players.index(playerIndex, player).cards.lift { it - card }
 
-
 /**
  * A composition of the following operations:
  *  - Increment the [GameState.indexOfCurrentPlayer] by 1
@@ -116,5 +115,3 @@ internal fun reactWithoutCard(victim: Player) =
  */
 internal fun reactWithCard(victim: Player, card: Card) =
     (removeCard(victim, card) compose addToHeap(card))
-
-

@@ -3,7 +3,6 @@ package common
 import arrow.optics.optics
 import common.cards.Card
 
-
 @optics
 data class GameState(
     val id: Id<GameState>,

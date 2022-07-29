@@ -15,7 +15,7 @@ enum class SpecialAction(
     RedBullDispenser("Red Bull Dispenser", "Take 3 cards"),
     Heisenbug("Heisenbug", "Bugs for everybody!");
 
-    override val kind: CardKind = CardKind.SpecialAction;
+    override val kind: CardKind = CardKind.SpecialAction
 
     companion object {
         val playingSet: List<Card> = SpecialAction.values().flatMap { specialAction ->
@@ -27,6 +27,4 @@ enum class SpecialAction(
             }
         }
     }
-
-
 }

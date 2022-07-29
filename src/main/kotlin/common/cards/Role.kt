@@ -1,31 +1,29 @@
 package common.cards
 
-
 enum class Role(
     override val title: String,
-    override val description: String,
+    override val description: String
 ) : Card {
 
     Manager(
         "Manager",
-        "Aim: Remove evil code monkeys and consultant",
+        "Aim: Remove evil code monkeys and consultant"
     ),
     Consultant(
         "Consultant",
-        "Aim: Get everyone else fired; Manager last!",
+        "Aim: Get everyone else fired; Manager last!"
     ),
     HonestDeveloper(
         "Honest Developer",
-        "Aim: Get evil code monkeys & consultant fired",
+        "Aim: Get evil code monkeys & consultant fired"
 
-        ),
+    ),
     EvilCodeMonkey(
         "Evil Code Monkey",
-        "Aim: Get the Manager fired.",
+        "Aim: Get the Manager fired."
     );
 
-    override val kind: CardKind = CardKind.Role;
-
+    override val kind: CardKind = CardKind.Role
 
     companion object {
         val playingSet = Role.values().flatMap { role ->
@@ -36,5 +34,4 @@ enum class Role(
             }
         }
     }
-
 }

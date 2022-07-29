@@ -30,7 +30,6 @@ interface FSM<S, E, V> {
      * a [TransitionError] is returned instead.
      */
     suspend fun send(event: E): Effect<TransitionError, Unit>
-
 }
 
 /**
@@ -62,7 +61,6 @@ internal class DefaultStateAutomaton<S : Any, E : Any, V : Any>(
         .map { it.target }
         .stateIn(scope, SharingStarted.Lazily, initialState)
 
-
     private suspend fun transition(event: E) {
         registeredTransitions[state.value]
             ?.find { (_, on) -> on::class.java.isAssignableFrom(event::class.java) }
@@ -74,16 +72,13 @@ internal class DefaultStateAutomaton<S : Any, E : Any, V : Any>(
             }
     }
 
-
     override suspend fun send(event: E): Effect<TransitionError, Unit> = effect {
         ensure(hasTransitionFor(event)) { TransitionError.InvalidTransition(state.value, event) }
         transition(event)
     }
-
 
     private fun hasTransitionFor(event: E): Boolean =
         registeredTransitions[state.value]
             ?.any { (_, on) -> on::class.java.isAssignableFrom(event::class.java) }
             ?: false
 }
-

@@ -17,5 +17,4 @@ enum class BugReport(
     companion object {
         val playingSet: List<Card> = BugReport.values().flatMap { bug -> List(4) { bug } }
     }
-
 }

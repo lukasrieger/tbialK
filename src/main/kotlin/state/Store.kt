@@ -62,7 +62,6 @@ private class DefaultStateStore<V, T>(
 
     private val eventChannel: Channel<V> = Channel(capacity = 1)
 
-
     override val state = eventChannel
         .receiveAsFlow()
         .scan(initialState, reducer)
@@ -85,7 +84,6 @@ internal fun <V, T> stateStore(
     coroutineScope: CoroutineScope
 ): StateStore<V, T> = DefaultStateStore(initialState, reducer, interceptor, coroutineScope)
 
-
 /**
  * Convenience function to construct a [StateStore] without an [Interceptor].
  * See [stateStore] for more details.
@@ -96,7 +94,6 @@ internal fun <V, T : Any> stateStore(
     coroutineScope: CoroutineScope
 ): StateStore<V, T> = stateStore(initialState, reducer, defaultInterceptor(), coroutineScope)
 
-
 /**
  * Convenience function to construct a [StateStore] without an [Interceptor] in the context of a [CoroutineScope].
  * See [stateStore] for more details.
@@ -106,4 +103,3 @@ internal fun <V, T> CoroutineScope.stateStore(
     reducer: Reducer<V, T>,
     interceptor: Interceptor<T> = defaultInterceptor()
 ): StateStore<V, T> = stateStore(initialState, reducer, interceptor, this)
-

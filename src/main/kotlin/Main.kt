@@ -10,7 +10,6 @@ import state.Interceptor
 import state.stateMachineConfig
 import state.stateStore
 
-
 private val players = listOf(
     Player(
         user = User(Id(34566), "Lukas", "Lukas", "1234"),
@@ -32,7 +31,7 @@ private val players = listOf(
         character = Character.values().random(),
         prestige = 3,
         cards = listOf()
-    ),
+    )
 )
 
 val initialGameState = GameState(
@@ -51,7 +50,6 @@ val stateLoggingInterceptor: Interceptor<GameState> = {
     println("Index of current player: ${it.indexOfCurrentPlayer}")
 }
 
-
 val tbialStateMachineConfig = stateMachineConfig {
     State.Stumbling into State.PlayCards via Event.DrawCards
     State.PlayCards into State.Cede via Event.NextTurn
@@ -65,7 +63,6 @@ val tbialStateMachineProvider = { scope: CoroutineScope ->
         scope = scope
     )
 }
-
 
 suspend fun main(): Unit = coroutineScope {
     val stateMachine = tbialStateMachineProvider(this)

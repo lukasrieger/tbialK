@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.7.10"
     id("com.google.devtools.ksp") version "1.7.10-1.0.6"
+    id("com.diffplug.spotless") version "6.9.0"
     application
 }
 
@@ -51,6 +52,14 @@ tasks.test {
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
 }
+
+spotless {
+    kotlin {
+        target("**/*.kt")
+        ktlint().editorConfigOverride(mapOf("disabled_rules" to "no-wildcard-imports"))
+    }
+}
+
 
 application {
     mainClass.set("MainKt")

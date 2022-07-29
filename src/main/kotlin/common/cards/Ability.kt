@@ -15,7 +15,6 @@ enum class Ability(
 
     override val kind: CardKind = CardKind.Ability
 
-
     companion object {
         val playingSet: List<Card> = Ability.values()
             .flatMap { ability ->
@@ -26,5 +25,4 @@ enum class Ability(
                 }
             }
     }
-
 }

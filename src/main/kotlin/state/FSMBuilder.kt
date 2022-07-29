@@ -2,7 +2,6 @@ package state
 
 import kotlinx.coroutines.CoroutineScope
 
-
 /**
  * DSL provider to define generic FSM transitions between states of type [V] triggered by events of type [E]
  */
@@ -18,7 +17,6 @@ class TransitionBuilder<E : Any, V : Any> {
     }
 
     fun build() = PartialFSM(registeredTransitions)
-
 }
 
 /**
@@ -43,7 +41,7 @@ data class PartialFSM<E : Any, V : Any>(val transitions: List<Transition<V, E>>)
     )
 
     context(CoroutineScope)
-            operator fun <S : Any> invoke(
+    operator fun <S : Any> invoke(
         initialState: V,
         initialStoreState: S,
         stateReducer: Reducer<E, S>,
