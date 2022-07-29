@@ -6,7 +6,7 @@ plugins {
     application
 }
 
-val arrowVersion = "1.1.3-alpha.32"
+val arrowVersion = "1.1.3-alpha.37"
 
 group = "org.example"
 version = "1.0-SNAPSHOT"
