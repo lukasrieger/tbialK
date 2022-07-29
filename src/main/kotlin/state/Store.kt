@@ -51,7 +51,7 @@ interface StateStore<V, T> {
  * Default implementation of [StateStore].
  *
  * Successor state computation is handled by [reducer].
- * Each newly computed state is passed to [interceptor] for handling user defined side-effects.
+ * Each newly computed state is passed to [interceptor] for handling user defined side effects.
  */
 private class DefaultStateStore<V, T>(
     initialState: T,
@@ -60,7 +60,7 @@ private class DefaultStateStore<V, T>(
     coroutineScope: CoroutineScope
 ) : StateStore<V, T> {
 
-    private val eventChannel: Channel<V> = Channel(capacity = 1)
+    private val eventChannel: Channel<V> = Channel(capacity = 0)
 
     override val state = eventChannel
         .receiveAsFlow()

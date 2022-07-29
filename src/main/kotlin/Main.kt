@@ -1,3 +1,4 @@
+
 import common.*
 import common.cards.Character
 import common.cards.PlayingDeck
@@ -8,7 +9,6 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import state.Interceptor
 import state.stateMachineConfig
-import state.stateStore
 
 private val players = listOf(
     Player(
@@ -51,29 +51,35 @@ val stateLoggingInterceptor: Interceptor<GameState> = {
 }
 
 val tbialStateMachineConfig = stateMachineConfig<GameState, _, _> {
-    globalGuard { gameState, event: Event -> event.from == gameState.currentPlayer }
-    State.Stumbling into State.PlayCards via Event.DrawCards
-    State.PlayCards into State.Cede via Event.NextTurn guard { _, _ -> false }
+    State.Draw into State.Play via Event.DrawCards
+    State.Play into State.Draw via Event.NextTurn
 }
 
 val tbialStateMachineProvider = { scope: CoroutineScope ->
     tbialStateMachineConfig(
-        initialState = State.Init,
+        initialState = State.Draw,
         initialStoreState = initialGameState,
         stateReducer = eventReducer,
+        interceptor = stateLoggingInterceptor,
         scope = scope
     )
 }
 
 suspend fun main(): Unit = coroutineScope {
     val stateMachine = tbialStateMachineProvider(this)
-    val store = stateStore(initialGameState, eventReducer, stateLoggingInterceptor)
 
-    launch { store.state.collect() }
+    launch { stateMachine.store.state.collect() }
 
-    store.send(Event.DrawCards)
-    store.send(Event.NextTurn)
+    stateMachine.send(Event.DrawCards)
+    stateMachine.send(Event.NextTurn)
+    stateMachine.send(Event.DrawCards)
 
-    store.send(Event.DrawCards)
-    store.send(Event.ReactWithCard(store.state.value.currentPlayer, store.state.value.currentPlayer.cards.first()))
+    stateMachine.send(
+        Event.ReactWithCard(
+            stateMachine.store.state.value.currentPlayer,
+            stateMachine.store.state.value.currentPlayer.cards.first()
+        )
+    )
+
+    println("Done...")
 }

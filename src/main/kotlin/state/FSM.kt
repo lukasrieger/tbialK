@@ -1,7 +1,7 @@
 package state
 
-import arrow.core.continuations.Effect
-import arrow.core.continuations.effect
+import arrow.core.Either
+import arrow.core.continuations.either
 import arrow.fx.coroutines.parZip
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
@@ -29,7 +29,7 @@ interface FSM<S, E, V> {
      * If there is no suitable successor state given by the combination of the current state [state] and the given [event],
      * a [TransitionError] is returned instead.
      */
-    suspend fun send(event: E): Effect<TransitionError, Unit>
+    suspend fun send(event: E): Either<TransitionError, Unit>
 }
 
 /**
@@ -52,14 +52,14 @@ internal class DefaultStateAutomaton<S : Any, E : Any, V : Any>(
             }
         }
 
-    private val stateChannel: Channel<Transition<S, V, E>> = Channel(1)
+    private val stateChannel: Channel<Transition<S, V, E>> = Channel(capacity = 0)
 
     override val store: StateStore<E, S> = stateStore(initialStoreState, stateReducer, interceptor, scope)
 
     override val state: StateFlow<V> = stateChannel
         .receiveAsFlow()
         .map { it.target }
-        .stateIn(scope, SharingStarted.Lazily, initialState)
+        .stateIn(scope, SharingStarted.Eagerly, initialState)
 
     private suspend fun transition(event: E) {
         registeredTransitions[state.value]
@@ -72,7 +72,7 @@ internal class DefaultStateAutomaton<S : Any, E : Any, V : Any>(
             }
     }
 
-    override suspend fun send(event: E): Effect<TransitionError, Unit> = effect {
+    override suspend fun send(event: E): Either<TransitionError, Unit> = either {
         ensure(hasTransitionFor(event)) { TransitionError.InvalidTransition(state.value, event) }
         transition(event)
     }
