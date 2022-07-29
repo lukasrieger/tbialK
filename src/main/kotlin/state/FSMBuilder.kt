@@ -5,15 +5,33 @@ import kotlinx.coroutines.CoroutineScope
 /**
  * DSL provider to define generic FSM transitions between states of type [V] triggered by events of type [E]
  */
-class TransitionBuilder<E : Any, V : Any> {
+@Suppress("UNCHECKED_CAST")
+class TransitionBuilder<S : Any, E : Any, V : Any> {
     inner class Edge(val source: V, val target: V)
 
-    private val registeredTransitions: MutableList<Transition<V, E>> = mutableListOf()
+    private val registeredTransitions: MutableList<Transition<S, V, E>> = mutableListOf()
+
+    private var globalGuard = emptyGuard<S, E>()
 
     infix fun V.into(target: V): Edge = Edge(this, target)
 
-    infix fun Edge.via(event: E) {
-        registeredTransitions.add(Transition(this.source, this.target, event))
+    fun globalGuard(guard: Guard<S, E>) {
+        globalGuard += guard
+    }
+
+    infix fun <A : E> Edge.via(event: A): Transition<S, V, A> {
+        val transition = Transition(this.source, this.target, event, globalGuard)
+        registeredTransitions.add(transition as Transition<S, V, E>)
+
+        return transition
+    }
+
+    infix fun <A : E> Transition<S, V, A>.guard(guard: Guard<S, A>) {
+        val transition = registeredTransitions.find { it == this } ?: return
+        transition as Transition<S, V, A>
+        val guardedTransition = transition.copy(guard = transition.guard + guard)
+
+        registeredTransitions[registeredTransitions.indexOf(transition)] = guardedTransition as Transition<S, V, E>
     }
 
     fun build() = PartialFSM(registeredTransitions)
@@ -23,9 +41,9 @@ class TransitionBuilder<E : Any, V : Any> {
  * A partially constructed finite-state machine with state type [V] and event/action type [E], built via [stateMachineConfig].
  * To construct a fully configured FSM from this configuration, see [invoke].
  */
-data class PartialFSM<E : Any, V : Any>(val transitions: List<Transition<V, E>>) {
+data class PartialFSM<S : Any, E : Any, V : Any>(val transitions: List<Transition<S, V, E>>) {
 
-    operator fun <S : Any> invoke(
+    operator fun invoke(
         initialState: V,
         initialStoreState: S,
         stateReducer: Reducer<E, S>,
@@ -39,25 +57,10 @@ data class PartialFSM<E : Any, V : Any>(val transitions: List<Transition<V, E>>)
         transitions = transitions,
         scope = scope
     )
-
-    context(CoroutineScope)
-    operator fun <S : Any> invoke(
-        initialState: V,
-        initialStoreState: S,
-        stateReducer: Reducer<E, S>,
-        interceptor: Interceptor<S> = defaultInterceptor()
-    ): FSM<S, E, V> = DefaultStateAutomaton(
-        initialState = initialState,
-        initialStoreState = initialStoreState,
-        stateReducer = stateReducer,
-        interceptor = interceptor,
-        transitions = transitions,
-        scope = this@CoroutineScope
-    )
 }
 
-fun <E : Any, V : Any> stateMachineConfig(builder: TransitionBuilder<E, V>.() -> Unit): PartialFSM<E, V> {
-    val transitionBuilder = TransitionBuilder<E, V>()
+fun <S : Any, E : Any, V : Any> stateMachineConfig(builder: TransitionBuilder<S, E, V>.() -> Unit): PartialFSM<S, E, V> {
+    val transitionBuilder = TransitionBuilder<S, E, V>()
     builder(transitionBuilder)
 
     return transitionBuilder.build()

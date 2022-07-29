@@ -41,18 +41,18 @@ internal class DefaultStateAutomaton<S : Any, E : Any, V : Any>(
     initialStoreState: S,
     stateReducer: Reducer<E, S>,
     interceptor: Interceptor<S>,
-    transitions: List<Transition<V, E>>,
+    transitions: List<Transition<S, V, E>>,
     scope: CoroutineScope
 ) : FSM<S, E, V> {
 
-    private val registeredTransitions: Map<V, Set<Pair<V, E>>> =
+    private val registeredTransitions: Map<V, Set<Triple<V, E, Guard<S, E>>>> =
         buildMap {
-            transitions.forEach { (source, target, event) ->
-                compute(source) { _, v -> setOf(target to event) + (v ?: emptySet()) }
+            transitions.forEach { (source, target, event, guard) ->
+                compute(source) { _, v -> setOf(Triple(target, event, guard)) + (v ?: emptySet()) }
             }
         }
 
-    private val stateChannel: Channel<Transition<V, E>> = Channel(1)
+    private val stateChannel: Channel<Transition<S, V, E>> = Channel(1)
 
     override val store: StateStore<E, S> = stateStore(initialStoreState, stateReducer, interceptor, scope)
 
@@ -79,6 +79,7 @@ internal class DefaultStateAutomaton<S : Any, E : Any, V : Any>(
 
     private fun hasTransitionFor(event: E): Boolean =
         registeredTransitions[state.value]
-            ?.any { (_, on) -> on::class.java.isAssignableFrom(event::class.java) }
+            ?.find { (_, on) -> on::class.java.isAssignableFrom(event::class.java) }
+            ?.let { (_, event, guard) -> guard(store.state.value, event) }
             ?: false
 }

@@ -50,9 +50,10 @@ val stateLoggingInterceptor: Interceptor<GameState> = {
     println("Index of current player: ${it.indexOfCurrentPlayer}")
 }
 
-val tbialStateMachineConfig = stateMachineConfig {
+val tbialStateMachineConfig = stateMachineConfig<GameState, _, _> {
+    globalGuard { gameState, event: Event -> event.from == gameState.currentPlayer }
     State.Stumbling into State.PlayCards via Event.DrawCards
-    State.PlayCards into State.Cede via Event.NextTurn
+    State.PlayCards into State.Cede via Event.NextTurn guard { _, _ -> false }
 }
 
 val tbialStateMachineProvider = { scope: CoroutineScope ->

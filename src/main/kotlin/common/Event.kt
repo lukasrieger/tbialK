@@ -3,12 +3,14 @@ package common
 import common.cards.Card
 import state.*
 
-sealed interface Event {
-    data class ReactWithCard(val victim: Player, val card: Card) : Event
-    data class ReactWithoutCard(val victim: Player) : Event
+sealed class Event {
 
-    object NextTurn : Event
-    object DrawCards : Event
+    val from: Player get() = TODO()
+    data class ReactWithCard(val victim: Player, val card: Card) : Event()
+    data class ReactWithoutCard(val victim: Player) : Event()
+
+    object NextTurn : Event()
+    object DrawCards : Event()
 }
 
 val eventReducer: Reducer<Event, GameState> = { state, event ->
