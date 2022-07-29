@@ -2,9 +2,6 @@ package common
 
 import arrow.optics.optics
 import common.cards.Card
-import common.cards.Character
-import common.cards.PlayingDeck
-import common.cards.Role
 
 
 @optics

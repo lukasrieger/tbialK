@@ -55,7 +55,8 @@ private val increaseAllMentalHealth = GameState.players.every(Every.list()).ment
 /**
  * Given a Player, return a modified Player with [Player.mentalHealth] decreased by 1
  */
-private val looseMentalHealth = { victim: Player -> GameState.players.index(playerIndex, victim).mentalHealth.lift { it - 1 } }
+private val looseMentalHealth =
+    { victim: Player -> GameState.players.index(playerIndex, victim).mentalHealth.lift { it - 1 } }
 
 /**
  * Given a [Card], return a function taking a GameState, that returns a modified GameState with the given card added to the heap

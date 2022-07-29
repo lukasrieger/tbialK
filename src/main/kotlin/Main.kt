@@ -2,12 +2,12 @@ import common.*
 import common.cards.Character
 import common.cards.PlayingDeck
 import common.cards.Role
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import state.Event
 import state.Interceptor
-import state.eventReducer
+import state.stateMachineConfig
 import state.stateStore
 
 
@@ -52,7 +52,23 @@ val stateLoggingInterceptor: Interceptor<GameState> = {
 }
 
 
+val tbialStateMachineConfig = stateMachineConfig {
+    State.Stumbling into State.PlayCards via Event.DrawCards
+    State.PlayCards into State.Cede via Event.NextTurn
+}
+
+val tbialStateMachineProvider = { scope: CoroutineScope ->
+    tbialStateMachineConfig(
+        initialState = State.Init,
+        initialStoreState = initialGameState,
+        stateReducer = eventReducer,
+        scope = scope
+    )
+}
+
+
 suspend fun main(): Unit = coroutineScope {
+    val stateMachine = tbialStateMachineProvider(this)
     val store = stateStore(initialGameState, eventReducer, stateLoggingInterceptor)
 
     launch { store.state.collect() }

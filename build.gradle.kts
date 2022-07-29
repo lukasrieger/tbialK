@@ -38,6 +38,12 @@ kotlin {
     }
 }
 
+tasks.withType<KotlinCompile>().configureEach {
+    kotlinOptions {
+        freeCompilerArgs = freeCompilerArgs + "-Xcontext-receivers"
+    }
+}
+
 tasks.test {
     useJUnitPlatform()
 }
