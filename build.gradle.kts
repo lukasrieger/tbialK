@@ -1,13 +1,15 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    kotlin("jvm") version "1.7.10"
-    id("com.google.devtools.ksp") version "1.7.10-1.0.6"
-    id("com.diffplug.spotless") version "6.9.0"
+    alias(libs.plugins.kotlin)
+
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.spotless)
+
     application
 }
 
-val arrowVersion = "1.1.3-alpha.37"
 
 group = "org.example"
 version = "1.0-SNAPSHOT"
@@ -17,17 +19,15 @@ repositories {
 }
 
 dependencies {
-    implementation(platform("io.arrow-kt:arrow-stack:$arrowVersion"))
+    implementation(libs.coroutines)
+    implementation(libs.arrow.core)
+    implementation(libs.arrow.optics)
+    implementation(libs.arrow.fx.coroutines)
 
-    ksp("io.arrow-kt:arrow-optics-ksp-plugin:$arrowVersion")
+    ksp(libs.arrow.optics.ksp)
 
-    implementation("io.arrow-kt:arrow-core")
-    implementation("io.arrow-kt:arrow-optics")
-    implementation("io.arrow-kt:arrow-fx-coroutines")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-
-    testImplementation(kotlin("test"))
+    testImplementation(libs.kotlin.test)
 }
 
 kotlin {
