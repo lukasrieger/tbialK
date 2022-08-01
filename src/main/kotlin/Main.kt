@@ -3,11 +3,11 @@ import common.*
 import common.cards.Character
 import common.cards.PlayingDeck
 import common.cards.Role
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import state.Interceptor
+import state.invoke
 import state.stateMachineConfig
 
 private val players = listOf(
@@ -51,19 +51,16 @@ val stateLoggingInterceptor: Interceptor<GameState> = {
 }
 
 val tbialStateMachineConfig = stateMachineConfig<GameState, _, _> {
-    State.Draw into State.Play via Event.DrawCards
-    State.Play into State.Draw via Event.NextTurn
+    State.Draw into State.Play via Event.DrawCards::class
+    State.Play into State.Draw via Event.NextTurn::class
 }
 
-val tbialStateMachineProvider = { scope: CoroutineScope ->
-    tbialStateMachineConfig(
-        initialState = State.Draw,
-        initialStoreState = initialGameState,
-        stateReducer = eventReducer,
-        interceptor = stateLoggingInterceptor,
-        scope = scope
-    )
-}
+val tbialStateMachineProvider = tbialStateMachineConfig(
+    initialState = State.Draw,
+    initialStoreState = initialGameState,
+    stateReducer = eventReducer,
+    interceptor = stateLoggingInterceptor
+)
 
 suspend fun main(): Unit = coroutineScope {
     val stateMachine = tbialStateMachineProvider(this)
