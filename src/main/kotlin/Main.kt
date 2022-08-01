@@ -50,7 +50,9 @@ val stateLoggingInterceptor: Interceptor<GameState> = {
     println("Index of current player: ${it.indexOfCurrentPlayer}")
 }
 
-val tbialStateMachineConfig = stateMachineConfig<GameState, _, _> {
+val tbialStateMachineConfig = stateMachineConfig {
+    globalGuard { state: GameState, event: Event -> state.currentPlayer == event.origin }
+
     State.Draw into State.Play via Event.DrawCards::class
     State.Play into State.Draw via Event.NextTurn::class
 }
@@ -64,17 +66,19 @@ val tbialStateMachineProvider = tbialStateMachineConfig(
 
 suspend fun main(): Unit = coroutineScope {
     val stateMachine = tbialStateMachineProvider(this)
+    val firstPlayer = stateMachine.store.state.value.currentPlayer
 
     launch { stateMachine.store.state.collect() }
 
-    stateMachine.send(Event.DrawCards)
-    stateMachine.send(Event.NextTurn)
-    stateMachine.send(Event.DrawCards)
+    stateMachine.send(Event.DrawCards(origin = firstPlayer)).let(::println)
+    stateMachine.send(Event.NextTurn(origin = firstPlayer)).let(::println)
+    stateMachine.send(Event.DrawCards(origin = firstPlayer)).let(::println)
 
     stateMachine.send(
         Event.ReactWithCard(
+            origin = firstPlayer,
             stateMachine.store.state.value.currentPlayer,
-            stateMachine.store.state.value.currentPlayer.cards.first()
+            stateMachine.store.state.value.currentPlayer.cards.random()
         )
     )
 
