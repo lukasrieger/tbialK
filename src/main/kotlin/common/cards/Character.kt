@@ -1,5 +1,8 @@
 package common.cards
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 enum class Character(
     override val title: String,
     override val description: String,

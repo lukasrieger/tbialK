@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.kotlin)
-
+    alias(libs.plugins.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.spotless)
 
@@ -20,6 +20,7 @@ repositories {
 
 dependencies {
     implementation(libs.coroutines)
+    implementation(libs.json)
     implementation(libs.arrow.core)
     implementation(libs.arrow.optics)
     implementation(libs.arrow.fx.coroutines)

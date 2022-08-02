@@ -4,9 +4,11 @@ import arrow.optics.optics
 import common.cards.Card
 import common.cards.Character
 import common.cards.Role
+import kotlinx.serialization.Serializable
 import java.util.*
 
 @optics
+@Serializable
 data class Player(
     val id: Id<Player> = Id(UUID.randomUUID().hashCode()),
     val user: User,

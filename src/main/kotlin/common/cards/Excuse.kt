@@ -1,5 +1,8 @@
 package common.cards
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 enum class Excuse(
     override val title: String,
     override val description: String
