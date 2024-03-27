@@ -1,5 +1,5 @@
 [versions]
-kotlin = "1.9.22"
+kotlin = "1.9.23"
 arrow = "1.2.1"
 coroutines = "1.8.0-RC2"
 ksp = "1.9.22-1.0.17"
