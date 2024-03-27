@@ -10,7 +10,7 @@ data class GameState(
     val stack: List<Card>,
     val heap: List<Card>,
     val frontCards: Map<Player, List<Card>>,
-    val turn: Turn,
+    val turn: TurnState,
     val indexOfCurrentPlayer: Int
 ) {
     val currentPlayer = players[indexOfCurrentPlayer]

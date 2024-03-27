@@ -3,7 +3,7 @@ package common
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class Turn {
+enum class TurnState {
     Stumbling,
     Draw,
     PlayCards

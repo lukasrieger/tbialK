@@ -19,7 +19,7 @@ enum class Ability(
     override val kind: CardKind = CardKind.Ability
 
     companion object {
-        val playingSet: List<Card> = Ability.values()
+        val playingSet: List<Card> = entries
             .flatMap { ability ->
                 when (ability) {
                     BugDelegation, WearsTieAtWork, Google, Accenture -> List(2) { ability }

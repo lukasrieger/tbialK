@@ -18,6 +18,6 @@ enum class BugReport(
     override val kind: CardKind = CardKind.BugReport
 
     companion object {
-        val playingSet: List<Card> = BugReport.values().flatMap { bug -> List(4) { bug } }
+        val playingSet: List<Card> = BugReport.entries.flatMap { bug -> List(4) { bug } }
     }
 }

@@ -33,19 +33,19 @@ private val playerIndex = Index<List<Player>, Player, Player> { player ->
 private val nextPlayerIndex = GameState.indexOfCurrentPlayer.lift { it + 1 }
 
 /**
- * Given a GameState, return a modified GameState with [GameState.turn] transitioned to [Turn.Draw]
+ * Given a GameState, return a modified GameState with [GameState.turn] transitioned to [TurnState.Draw]
  */
-private val toDrawState = GameState.turn.lift { Turn.Draw }
+private val toDrawState = GameState.turn.lift { TurnState.Draw }
 
 /**
- * Given a GameState, return a modified GameState with [GameState.turn] transitioned to [Turn.PlayCards]
+ * Given a GameState, return a modified GameState with [GameState.turn] transitioned to [TurnState.PlayCards]
  */
-private val toPlayState = GameState.turn.lift { Turn.PlayCards }
+private val toPlayState = GameState.turn.lift { TurnState.PlayCards }
 
 /**
- * Given a GameState, return a modified GameState with [GameState.turn] transitioned to [Turn.Stumbling]
+ * Given a GameState, return a modified GameState with [GameState.turn] transitioned to [TurnState.Stumbling]
  */
-private val toStumblingState = GameState.turn.lift { Turn.Stumbling }
+private val toStumblingState = GameState.turn.lift { TurnState.Stumbling }
 
 /**
  * Given a GameState, return a modified GameState with every player's [Player.mentalHealth] increased by 1
@@ -87,7 +87,7 @@ private fun removeCard(player: Player, card: Card) =
 /**
  * A composition of the following operations:
  *  - Increment the [GameState.indexOfCurrentPlayer] by 1
- *  - Transfer to the [Turn.Stumbling] state
+ *  - Transfer to the [TurnState.Stumbling] state
  */
 internal val nextPlayerTurn = nextPlayerIndex compose toStumblingState
 
@@ -95,7 +95,7 @@ internal val nextPlayerTurn = nextPlayerIndex compose toStumblingState
  * A composition of the following operations:
  *  - Pop 2 cards from the [heap]
  *  - Give the popped cards to the player at [index]
- *  - Transfer to the [Turn.PlayCards] state
+ *  - Transfer to the [TurnState.PlayCards] state
  */
 internal fun drawCards(index: Int, heap: List<Card>, amount: Int = DEFAULT_DRAW_COUNT) =
     popFromHeap(amount) compose giveCardsByIndex(index, heap.take(amount)) compose toPlayState
@@ -103,7 +103,7 @@ internal fun drawCards(index: Int, heap: List<Card>, amount: Int = DEFAULT_DRAW_
 /**
  * A composition of the following operations:
  *  - Subtract 1 mental health from the [victim]
- *  - Transfer to the [Turn.PlayCards] state
+ *  - Transfer to the [TurnState.PlayCards] state
  */
 internal fun reactWithoutCard(victim: Player) =
     (looseMentalHealth(victim) compose toPlayState)

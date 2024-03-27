@@ -21,7 +21,7 @@ enum class SpecialAction(
     override val kind: CardKind = CardKind.SpecialAction
 
     companion object {
-        val playingSet: List<Card> = SpecialAction.values().flatMap { specialAction ->
+        val playingSet: List<Card> = entries.flatMap { specialAction ->
             when (specialAction) {
                 Refactoring, Pwnd -> List(4) { specialAction }
                 SystemIntegration -> List(3) { specialAction }

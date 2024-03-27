@@ -1,10 +1,11 @@
 [versions]
-kotlin = "1.7.10"
-arrow = "1.1.3-alpha.37"
-coroutines = "1.6.4"
-ksp = "1.7.10-1.0.6"
+kotlin = "1.9.22"
+arrow = "1.2.1"
+coroutines = "1.8.0-RC2"
+ksp = "1.9.22-1.0.17"
 spotless = "6.9.0"
-json = "1.4.0-RC"
+json = "1.6.2"
+inikio = "0.1"
 
 [libraries]
 coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -14,6 +15,8 @@ arrow-fx-coroutines = { module = "io.arrow-kt:arrow-fx-coroutines", version.ref 
 arrow-optics-ksp = { module = "io.arrow-kt:arrow-optics-ksp-plugin", version.ref = "arrow" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "json" }
+inikio-core = { module = "com.github.serras.inikio:inikio-core", version.ref = "inikio" }
+inikio-ksp = { module = "com.github.serras.inikio:inikio-ksp", version.ref = "inikio" }
 
 
 [plugins]

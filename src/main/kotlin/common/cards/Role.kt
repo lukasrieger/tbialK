@@ -29,7 +29,7 @@ enum class Role(
     override val kind: CardKind = CardKind.Role
 
     companion object {
-        val playingSet = Role.values().flatMap { role ->
+        val playingSet = entries.flatMap { role ->
             when (role) {
                 Manager, Consultant -> listOf(role)
                 HonestDeveloper -> List(2) { role }

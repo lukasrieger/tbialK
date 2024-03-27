@@ -15,6 +15,6 @@ enum class Excuse(
     override val kind: CardKind = CardKind.Excuse
 
     companion object {
-        val playingSet = Excuse.values().flatMap { excuse -> List(4) { excuse } }
+        val playingSet = entries.flatMap { excuse -> List(4) { excuse } }
     }
 }

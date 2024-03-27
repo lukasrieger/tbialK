@@ -15,6 +15,6 @@ enum class Solution(
     override val kind: CardKind = CardKind.Solution
 
     companion object {
-        val playingSet: List<Card> = Solution.values().flatMap { solution -> List(2) { solution } }
+        val playingSet: List<Card> = entries.flatMap { solution -> List(2) { solution } }
     }
 }

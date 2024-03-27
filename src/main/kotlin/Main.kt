@@ -1,34 +1,33 @@
-
 import common.*
 import common.cards.Character
 import common.cards.PlayingDeck
 import common.cards.Role
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import state.Interceptor
-import state.invoke
-import state.stateMachineConfig
+import state.*
 
 private val players = listOf(
     Player(
         user = User(Id(34566), "Lukas", "Lukas", "1234"),
-        role = Role.values().random(),
-        character = Character.values().random(),
+        role = Role.entries.random(),
+        character = Character.entries.random(),
         prestige = 3,
         cards = listOf()
     ),
     Player(
         user = User(Id(87654), "David", "David", "2345678"),
-        role = Role.values().random(),
-        character = Character.values().random(),
+        role = Role.entries.random(),
+        character = Character.entries.random(),
         prestige = 3,
         cards = listOf()
     ),
     Player(
         user = User(Id(3456789), "Hans", "Hans", "98765"),
-        role = Role.values().random(),
-        character = Character.values().random(),
+        role = Role.entries.random(),
+        character = Character.entries.random(),
         prestige = 3,
         cards = listOf()
     )
@@ -40,7 +39,7 @@ val initialGameState = GameState(
     stack = listOf(),
     heap = PlayingDeck.cards,
     frontCards = mapOf(),
-    turn = Turn.Stumbling,
+    turn = TurnState.Stumbling,
     indexOfCurrentPlayer = 0
 )
 
@@ -64,23 +63,42 @@ val tbialStateMachineProvider = tbialStateMachineConfig(
     interceptor = stateLoggingInterceptor
 )
 
-suspend fun main(): Unit = coroutineScope {
-    val stateMachine = tbialStateMachineProvider(this)
-    val firstPlayer = stateMachine.store.state.value.currentPlayer
+//suspend fun main(): Unit = coroutineScope {
+//    val stateMachine = tbialStateMachineProvider(this)
+//    val firstPlayer = stateMachine.store.state.value.currentPlayer
+//
+//    launch { stateMachine.store.state.collect() }
+//
+//    stateMachine.send(Event.DrawCards(origin = firstPlayer)).let(::println)
+//    stateMachine.send(Event.NextTurn(origin = firstPlayer)).let(::println)
+//    stateMachine.send(Event.DrawCards(origin = firstPlayer)).let(::println)
+//
+//    stateMachine.send(
+//        Event.ReactWithCard(
+//            origin = firstPlayer,
+//            stateMachine.store.state.value.currentPlayer,
+//            stateMachine.store.state.value.currentPlayer.cards.random()
+//        )
+//    )
+//
+//    println("Done...")
+//}
 
-    launch { stateMachine.store.state.collect() }
+val sessionContext = object : GameSessionContext {
+    override val remote: Channel<Unit>
+        get() = TODO("Not yet implemented")
+    override val local: Channel<Unit>
+        get() = TODO("Not yet implemented")
+    override val gameState: StateFlow<GameState>
+        get() = TODO("Not yet implemented")
 
-    stateMachine.send(Event.DrawCards(origin = firstPlayer)).let(::println)
-    stateMachine.send(Event.NextTurn(origin = firstPlayer)).let(::println)
-    stateMachine.send(Event.DrawCards(origin = firstPlayer)).let(::println)
+}
 
-    stateMachine.send(
-        Event.ReactWithCard(
-            origin = firstPlayer,
-            stateMachine.store.state.value.currentPlayer,
-            stateMachine.store.state.value.currentPlayer.cards.random()
-        )
-    )
+fun main() {
+    println(AttackAnotherPlayer.toAction())
 
-    println("Done...")
+    with(sessionContext) {
+        AttackAnotherPlayer.toAction().execute()
+    }
+
 }

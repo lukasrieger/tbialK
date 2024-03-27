@@ -67,6 +67,6 @@ enum class Character(
     override val kind: CardKind = CardKind.Character
 
     companion object {
-        val playingSet = Character.values().toList()
+        val playingSet = entries
     }
 }

@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.kotlin)
     alias(libs.plugins.serialization)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.spotless)
 
     application
 }
@@ -16,6 +15,7 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    maven(url = "https://jitpack.io")
 }
 
 dependencies {
@@ -24,8 +24,10 @@ dependencies {
     implementation(libs.arrow.core)
     implementation(libs.arrow.optics)
     implementation(libs.arrow.fx.coroutines)
+    implementation(libs.inikio.core)
 
     ksp(libs.arrow.optics.ksp)
+    ksp(libs.inikio.ksp)
 
 
     testImplementation(libs.kotlin.test)
@@ -49,18 +51,6 @@ tasks.withType<KotlinCompile>().configureEach {
 tasks.test {
     useJUnitPlatform()
 }
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
-}
-
-spotless {
-    kotlin {
-        target("**/*.kt")
-        ktlint().editorConfigOverride(mapOf("disabled_rules" to "no-wildcard-imports"))
-    }
-}
-
 
 application {
     mainClass.set("MainKt")

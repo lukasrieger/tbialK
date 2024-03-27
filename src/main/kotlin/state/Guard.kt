@@ -1,5 +1,8 @@
 package state
 
+import common.cards.Card
+import fp.serrano.inikio.plugin.InitialStyleDSL
+
 /**
  * A guard is a non-blocking function that given a state S and event E, determines whether a potential transition into
  * some successor state S' would be valid.
