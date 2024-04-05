@@ -2,7 +2,7 @@
 kotlin = "1.9.22"
 arrow = "1.2.1"
 coroutines = "1.8.0-RC2"
-ksp = "1.9.22-1.0.17"
+ksp = "1.9.23-1.0.20"
 spotless = "6.9.0"
 json = "1.6.2"
 inikio = "0.1"
