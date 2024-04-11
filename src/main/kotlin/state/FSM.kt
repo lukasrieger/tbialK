@@ -1,8 +1,9 @@
 package state
 
 import arrow.core.Either
-import arrow.core.continuations.EffectScope
-import arrow.core.continuations.either
+import arrow.core.raise.Raise
+import arrow.core.raise.either
+import arrow.core.raise.ensure
 import arrow.fx.coroutines.parZip
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
@@ -50,7 +51,9 @@ internal class DefaultStateAutomaton<S : Any, E : Any, V : Any>(
     private val registeredTransitions: Map<V, Set<Triple<V, KClass<E>, Guard<S, E>>>> =
         buildMap {
             transitions.forEach { (source, target, event, guard) ->
-                compute(source) { _, v -> setOf(Triple(target, event, guard)) + (v ?: emptySet()) }
+                compute(source) { _, v ->
+                    setOf(Triple(target, event, guard)) + (v ?: emptySet())
+                }
             }
         }
 
@@ -74,6 +77,7 @@ internal class DefaultStateAutomaton<S : Any, E : Any, V : Any>(
             }
     }
 
+
     override suspend fun send(event: E): Either<TransitionError, Unit> = either {
         ensureTransitionFor(event)
         transition(event)
@@ -84,11 +88,12 @@ internal class DefaultStateAutomaton<S : Any, E : Any, V : Any>(
      * [state] to some successor state via event kind [E]. Additionally, ensure that if any potential transition has a
      * guard that accepts the current state and given event.
      */
-    private suspend fun EffectScope<TransitionError>.ensureTransitionFor(event: E): Unit =
+    context(Raise<TransitionError>)
+    private fun ensureTransitionFor(event: E): Unit =
         registeredTransitions[state.value]
             ?.find { (_, on) -> on.java.isAssignableFrom(event::class.java) }
             ?.let { (_, _, guard) ->
                 ensure(guard(store.state.value, event)) { TransitionError.GuardFailed(state.value, event) }
             }
-            ?: shift(TransitionError.InvalidTransition(state.value, event))
+            ?: raise(TransitionError.InvalidTransition(state.value, event))
 }

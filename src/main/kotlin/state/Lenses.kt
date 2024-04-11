@@ -1,9 +1,11 @@
 package state
 
+import arrow.core.andThen
 import arrow.core.compose
 import arrow.core.left
 import arrow.core.right
 import arrow.optics.Every
+import arrow.optics.Getter
 import arrow.optics.POptional
 import arrow.optics.dsl.every
 import arrow.optics.dsl.index
@@ -14,7 +16,7 @@ import common.cards.Card
 /**
  * Denotes the amount of cards to draw and give to the current player if no other specific amount is given
  */
-private const val DEFAULT_DRAW_COUNT = 20
+private const val DEFAULT_DRAW_COUNT = 2
 
 /**
  * A [Index] that can identify a [Player] in a list of players.
@@ -91,14 +93,22 @@ private fun removeCard(player: Player, card: Card) =
  */
 internal val nextPlayerTurn = nextPlayerIndex compose toStumblingState
 
+fun peekHeap(amount: Int) = Getter<GameState, List<Card>> { source ->
+    source.heap.take(amount)
+}
+
 /**
  * A composition of the following operations:
  *  - Pop 2 cards from the [heap]
  *  - Give the popped cards to the player at [index]
  *  - Transfer to the [TurnState.PlayCards] state
  */
-internal fun drawCards(index: Int, heap: List<Card>, amount: Int = DEFAULT_DRAW_COUNT) =
-    popFromHeap(amount) compose giveCardsByIndex(index, heap.take(amount)) compose toPlayState
+internal fun drawCards(index: Int, amount: Int = DEFAULT_DRAW_COUNT) =
+    peekHeap(amount).zip(Getter.id())::get andThen { (drawn, gameState) ->
+        drawn to giveCardsByIndex(index, drawn)(gameState)
+    } andThen { (drawn, gameState) ->
+        drawn to toPlayState(gameState)
+    }
 
 /**
  * A composition of the following operations:

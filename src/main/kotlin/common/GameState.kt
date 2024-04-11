@@ -15,5 +15,18 @@ data class GameState(
 ) {
     val currentPlayer = players[indexOfCurrentPlayer]
 
-    companion object
+
+    fun getStumblingCardForCurrentPlayer(): Card? = TODO()
+
+    companion object {
+        val EmptyState = GameState(
+            id = Id(-1),
+            players = emptyList(),
+            stack = emptyList(),
+            heap = emptyList(),
+            frontCards = emptyMap(),
+            turn = TurnState.Draw,
+            indexOfCurrentPlayer = -1
+        )
+    }
 }

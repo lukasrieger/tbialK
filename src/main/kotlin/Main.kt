@@ -2,11 +2,9 @@ import common.*
 import common.cards.Character
 import common.cards.PlayingDeck
 import common.cards.Role
+import dsl.GameSessionContext
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import state.*
 
 private val players = listOf(
@@ -95,10 +93,10 @@ val sessionContext = object : GameSessionContext {
 }
 
 fun main() {
-    println(AttackAnotherPlayer.toAction())
-
-    with(sessionContext) {
-        AttackAnotherPlayer.toAction().execute()
-    }
+//    println(AttackAnotherPlayer.toAction())
+//
+//    with(sessionContext) {
+//        AttackAnotherPlayer.toAction().execute()
+//    }
 
 }
