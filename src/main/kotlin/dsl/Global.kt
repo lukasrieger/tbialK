@@ -121,6 +121,8 @@ suspend fun globalClientHandler() {
 
 context(ServerContext, ServerHandlerContext, Interpreter<ServerGameSessionContext, ServerHandlerContext, Any?>)
 suspend fun globalServerHandler() {
+    gameState.onEach { stateChannel.send(it) }
+
     while (true) {
         select {
             channels.forEach { (id, channels) ->
