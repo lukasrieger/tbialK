@@ -1,13 +1,11 @@
 package dsl
 
 import arrow.core.Either
-import arrow.core.left
-import arrow.core.right
 import common.cards.Card
 
 typealias TurnResult = Either<Unit, List<Card>>
 
-val sequencedAction = program {
+val playerTurn = program {
     attemptToHandleStumblingCard()
     attackAnotherPlayer()
     finishTurn()
