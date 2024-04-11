@@ -50,7 +50,8 @@ class TransitionBuilder<S : Any, E : Any, V : Any> {
         val transition = registeredTransitions.find { it == this } ?: return
         val guardedTransition = this.copy(guard = transition.guard + guard)
 
-        registeredTransitions[registeredTransitions.indexOf(transition)] = guardedTransition as Transition.Abstract<S, V, E>
+        registeredTransitions[registeredTransitions.indexOf(transition)] =
+            guardedTransition as Transition.Abstract<S, V, E>
     }
 
     fun build() = partialFSM(registeredTransitions)

@@ -121,12 +121,12 @@ suspend fun globalClientHandler() {
 
 context(ServerContext, ServerHandlerContext, Interpreter<ServerGameSessionContext, ServerHandlerContext, Any?>)
 suspend fun globalServerHandler() {
-    while(true) {
+    while (true) {
         select {
             channels.forEach { (id, channels) ->
                 val (sender, receiver) = channels
                 receiver.onReceive { command ->
-                    when(command) {
+                    when (command) {
                         is Command.ActionC -> sender.send(Command.Result(command.action.execute()))
                         is Command.Result -> receivedResults[id]?.send(id to command.result)
                     }
@@ -135,7 +135,6 @@ suspend fun globalServerHandler() {
         }
     }
 }
-
 
 
 @Suppress("UNCHECKED_CAST")

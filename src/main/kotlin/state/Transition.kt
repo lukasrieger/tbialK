@@ -1,5 +1,7 @@
 package state
 
+import state.Transition.Abstract
+import state.Transition.Concrete
 import kotlin.reflect.KClass
 
 /**

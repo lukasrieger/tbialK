@@ -34,6 +34,7 @@ val finishTurn = program {
     when {
         currentlyHeldCards > ownMentalHealth ->
             discard(selectDiscardCards(amount = currentlyHeldCards - ownMentalHealth))
+
         else -> Unit
     }
 }
