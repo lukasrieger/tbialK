@@ -13,11 +13,3 @@ sealed interface Event {
     data class DrawCards(override val origin: Player) : Event
 }
 
-val eventReducer: Reducer<Event, GameState> = { state, event ->
-    when (event) {
-        is Event.DrawCards -> drawCards(state.indexOfCurrentPlayer, state.heap)
-        is Event.NextTurn -> nextPlayerTurn
-        is Event.ReactWithCard -> reactWithCard(event.victim, event.card)
-        is Event.ReactWithoutCard -> reactWithoutCard(event.victim)
-    }(state)
-}
