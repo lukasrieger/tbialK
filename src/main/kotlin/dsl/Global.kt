@@ -97,6 +97,9 @@ fun buildServerCallbacks() = object : ServerHandlerContext {
     override suspend fun <A> client(id: Id<Player>, block: suspend ActionBuilder<A>.() -> A): A =
         interpretActionClientside(id, action { block() })
 
+    override suspend fun <A> client(id: Id<Player>, action: Action<A>): A =
+        interpretActionClientside(id, action)
+
 }
 
 context(ClientContext, ClientHandlerContext)
