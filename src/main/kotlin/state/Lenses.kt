@@ -4,9 +4,7 @@ import arrow.core.andThen
 import arrow.core.compose
 import arrow.core.left
 import arrow.core.right
-import arrow.optics.Every
-import arrow.optics.Getter
-import arrow.optics.POptional
+import arrow.optics.*
 import arrow.optics.dsl.every
 import arrow.optics.dsl.index
 import arrow.optics.typeclasses.Index
@@ -109,6 +107,19 @@ internal fun drawCards(index: Int, amount: Int = DEFAULT_DRAW_COUNT) =
     } andThen { (drawn, gameState) ->
         drawn to toPlayState(gameState)
     }
+
+
+internal fun GameState.drawCards(amount: Int = DEFAULT_DRAW_COUNT): Pair<List<Card>, GameState> =
+    heap.take(amount) to copy {
+        GameState.heap transform { it.drop(amount) }
+        GameState.turn set TurnState.PlayCards
+
+        inside(GameState.players.index(Index.list(), players.indexOf(currentPlayer))) {
+            Player.cards transform { it + heap.take(amount) }
+        }
+
+    }
+
 
 /**
  * A composition of the following operations:

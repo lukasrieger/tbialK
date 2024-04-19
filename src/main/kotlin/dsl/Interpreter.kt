@@ -2,6 +2,7 @@ package dsl
 
 import kotlinx.coroutines.flow.update
 import state.drawCards
+import state.reactWithoutCard
 
 
 /**
@@ -70,16 +71,28 @@ fun <A> defaultClientInterpreter() =
 
 fun <A> defaultServerInterpreter() =
     object : Interpreter<ServerGameSessionContext, ServerHandlerContext, A> {
-        context(ServerGameSessionContext, ClientHandlerContext)
+        context(ServerGameSessionContext, ServerHandlerContext)
         override suspend fun Action<A>.execute(): A =
             when (this) {
                 is ServerAction ->
                     when (this) {
-                        is Action.AttackPlayer -> TODO()
+                        is Action.AttackPlayer -> {
+                            val outcome = client(target.id) {
+                                defendAttack(selectResponse())
+                            }
+
+                            when(outcome) {
+                                Outcome.Success -> next(outcome).execute()
+                                Outcome.Failure -> {
+                                    gameState.update(reactWithoutCard(target))
+                                    next(outcome).execute()
+                                }
+                            }
+                        }
                         is Action.DefendAttack -> TODO()
                         is Action.Discard -> TODO()
                         is Action.DrawCards -> {
-                            val (drawn, nextState) = drawCards(1)(gameState.value)
+                            val (drawn, nextState) = gameState.value.drawCards()
                             gameState.update { nextState }
                             next(drawn.let { it[0] to it[1] }).execute()
                         }
