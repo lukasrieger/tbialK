@@ -14,9 +14,19 @@ import kotlinx.coroutines.selects.select
 import kotlinx.serialization.Serializable
 
 @Serializable
+sealed interface Origin {
+    @Serializable
+    data object Server : Origin
+
+    @Serializable
+    data class Player(val player: Id<common.Player>) : Origin
+}
+
+
+@Serializable
 sealed interface Command<out A> {
     @Serializable
-    data class ActionC<out A>(val action: Action<A>) : Command<A>
+    data class ActionC<out A>(val origin: Origin, val action: Action<A>) : Command<A>
 
     @Serializable
     data class Result<out A>(val result: A) : Command<A>
@@ -40,6 +50,7 @@ data class ServerContext(
 
 data class ClientContext(
     val scope: CoroutineScope,
+    val self: Player,
     val receiver: ReceiveChannel<Command<*>> = Channel(),
     val sender: SendChannel<Command<*>> = Channel(),
     val stateChannel: ReceiveChannel<GameState> = Channel(),
@@ -58,15 +69,15 @@ data class ClientContext(
 
 context(ServerContext)
 suspend fun <A> interpretActionClientside(id: Id<Player>, action: Action<A>): A {
-    channels.getValue(id).first.send(Command.ActionC(action))
+    channels.getValue(id).first.send(Command.ActionC(Origin.Server, action))
     val result = receivedResults.getValue(id).receive()
 
     return result.coerce()
 }
 
 context(ClientContext)
-suspend fun <A> interpretActionServerside(action: Action<A>): A {
-    sender.send(Command.ActionC(action))
+suspend fun <A> interpretActionServerside(origin: Id<Player>, action: Action<A>): A {
+    sender.send(Command.ActionC(Origin.Player(origin), action))
     val result = receivedResults.receive()
 
     return result.coerce()
@@ -82,7 +93,7 @@ suspend fun <A> interpretActionClientside(action: Action<A>): A {
 context(ClientContext)
 fun buildClientCallbacks() = object : ClientHandlerContext {
     override suspend fun <A> server(block: suspend ActionBuilder<A>.() -> A): A =
-        interpretActionServerside(action { block() })
+        interpretActionServerside(self.id, action { block() })
 
     override suspend fun <A> client(block: suspend ActionBuilder<A>.() -> A): A =
         interpretActionClientside(action { block() })
@@ -91,8 +102,9 @@ fun buildClientCallbacks() = object : ClientHandlerContext {
 context(ServerContext)
 fun buildServerCallbacks() = object : ServerHandlerContext {
     override suspend fun <A> server(block: suspend ActionBuilder<A>.() -> A): A =
-        interpreter.run { action { block() }.execute() }.coerce()
-
+        with(Origin.Server) {
+            interpreter.run { action { block() }.execute() }.coerce()
+        }
 
     override suspend fun <A> client(id: Id<Player>, block: suspend ActionBuilder<A>.() -> A): A =
         interpretActionClientside(id, action { block() })
@@ -108,9 +120,11 @@ suspend fun globalClientHandler() {
         while (true) {
             select {
                 receiver.onReceive {
-                    when (it) {
-                        is Command.ActionC<*> -> sender.send(Command.Result(it.action.execute()))
-                        is Command.Result<*> -> receivedResults.send(it.result)
+                    with(Origin.Server) {
+                        when (it) {
+                            is Command.ActionC<*> -> sender.send(Command.Result(it.action.execute()))
+                            is Command.Result<*> -> receivedResults.send(it.result)
+                        }
                     }
                 }
             }
@@ -128,9 +142,11 @@ suspend fun globalServerHandler() {
             channels.forEach { (id, channels) ->
                 val (sender, receiver) = channels
                 receiver.onReceive { command ->
-                    when (command) {
-                        is Command.ActionC -> sender.send(Command.Result(command.action.execute()))
-                        is Command.Result -> receivedResults[id]?.send(id to command.result)
+                    with(Origin.Player(id)) {
+                        when (command) {
+                            is Command.ActionC -> sender.send(Command.Result(command.action.execute()))
+                            is Command.Result -> receivedResults[id]?.send(id to command.result)
+                        }
                     }
                 }
             }

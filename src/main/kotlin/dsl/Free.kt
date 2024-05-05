@@ -60,7 +60,7 @@ val freeTest = action2 {
 }
 
 fun interface Compiler<K, A> {
-    fun compile(value: K): Any?
+    fun compile(value: K): Any
 }
 
 fun <A> testCompiler() = Compiler<Action2<*>, A> {

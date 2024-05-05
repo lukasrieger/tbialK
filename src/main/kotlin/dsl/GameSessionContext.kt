@@ -11,3 +11,8 @@ interface GameSessionContext {
 interface ServerGameSessionContext {
     val gameState: MutableStateFlow<GameState>
 }
+
+
+interface ServerGameSessionContextWithOrigin : ServerGameSessionContext {
+    val origin: Origin
+}

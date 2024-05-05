@@ -11,7 +11,7 @@ import state.reactWithoutCard
  */
 fun interface Interpreter<C, H, A> {
 
-    context(C, H)
+    context(C, H, Origin)
     @Suppress("SUBTYPING_BETWEEN_CONTEXT_RECEIVERS")
     suspend fun Action<A>.execute(): A
 }
@@ -89,15 +89,28 @@ fun <A> defaultServerInterpreter() =
                                 }
                             }
                         }
-                        is Action.DefendAttack -> TODO()
-                        is Action.Discard -> TODO()
+                        is Action.DefendAttack ->
+                            next(if (defence != null) Outcome.Success else Outcome.Failure).execute()
+                        is Action.Discard -> {
+                            TODO()
+                        }
                         is Action.DrawCards -> {
                             val (drawn, nextState) = gameState.value.drawCards()
                             gameState.update { nextState }
                             next(drawn.let { it[0] to it[1] }).execute()
                         }
 
-                        is Action.HandleStumbling -> TODO()
+                        is Action.HandleStumbling -> {
+                            val outcome = when(via) {
+                                null -> {
+//                                    gameState.update(loose)
+                                    Outcome.Failure
+                                }
+                                else -> Outcome.Success
+                            }
+
+                            TODO()
+                        }
                     }
 
                 is Action.Done -> result
