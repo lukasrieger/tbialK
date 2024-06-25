@@ -4,7 +4,7 @@ arrow = "1.2.1"
 coroutines = "1.8.0-RC2"
 ksp = "1.9.22-1.0.17"
 spotless = "6.9.0"
-json = "1.6.2"
+json = "1.7.1"
 inikio = "0.1"
 
 [libraries]
